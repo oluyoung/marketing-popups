@@ -1,0 +1,208 @@
+.content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.header {
+  background: #1a2e4a;
+  padding: 24px 24px 20px;
+  flex-shrink: 0;
+
+  .urgencyDots {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+
+    span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+
+      &:nth-child(2) { background: #f97316; }
+      &:nth-child(3) { background: #eab308; opacity: 0.5; }
+      &:nth-child(4) { background: #6b7280; opacity: 0.3; }
+      &:nth-child(5) { background: #6b7280; opacity: 0.15; }
+    }
+  }
+
+  .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.15);
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 6px;
+  }
+}
+
+.goldPanel {
+  background: linear-gradient(160deg, #c8960c 0%, #e8b923 40%, #d4a017 100%);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  position: relative;
+  overflow: hidden;
+
+  .shimmer {
+    position: absolute;
+    width: 60px;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(20deg) translateX(-120px);
+    pointer-events: none;
+  }
+
+  .bottles {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+
+    .bottle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+
+      .bottleImg {
+        font-size: 64px;
+        filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+        line-height: 1;
+      }
+
+      .bottleLabel {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(26, 46, 74, 0.8);
+        background: rgba(255,255,255,0.4);
+        padding: 2px 8px;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  .stockBar {
+    width: 100%;
+    max-width: 200px;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 1;
+
+    .barBg {
+      height: 6px;
+      background: rgba(26, 46, 74, 0.2);
+      border-radius: 3px;
+      overflow: hidden;
+
+      .barFill {
+        height: 100%;
+        width: 18%;
+        background: #1a2e4a;
+        border-radius: 3px;
+      }
+    }
+
+    .barLabel {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: rgba(26, 46, 74, 0.75);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+  }
+}
+
+.footer {
+  background: #1a2e4a;
+  padding: 16px 20px;
+  flex-shrink: 0;
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    .current {
+      font-size: 22px;
+      font-weight: 700;
+      color: #e8b923;
+      font-family: var(--font-ui);
+    }
+
+    .original {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      text-decoration: line-through;
+    }
+
+    .save {
+      font-size: 11px;
+      font-weight: 700;
+      color: #4ade80;
+      background: rgba(74, 222, 128, 0.15);
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+  }
+
+  .cta {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    background: #e8b923;
+    color: #1a2e4a;
+    font-size: 13.5px;
+    font-weight: 800;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: opacity 0.2s, transform 0.1s;
+
+    &:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+    }
+  }
+
+  .remaining {
+    margin-top: 8px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    text-align: center;
+  }
+}

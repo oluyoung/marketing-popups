@@ -1,0 +1,57 @@
+.codeBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #111827;
+  color: #f9fafb;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  font-family: var(--code-font);
+  font-size: 14px;
+  margin-bottom: 40px;
+
+  .prompt {
+    color: #818cf8;
+    font-weight: 700;
+    user-select: none;
+  }
+}
+
+.nextGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 8px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.nextCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px;
+  color: var(--white-muted);
+  border: 1px solid var(--white-muted);
+  text-decoration: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    border-color: rgba(99, 102, 241, 0.35);
+    text-decoration: none;
+  }
+
+  .nextLabel {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--);
+    font-family: var(--text-font);
+  }
+
+  .nextDesc {
+    font-size: 14px;
+    color: var(--white-muted);
+  }
+}

@@ -1,0 +1,23 @@
+.header {
+  margin-bottom: 48px;
+
+  .importBox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-code-bg);
+    border: 1px solid var(--white-muted);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-family: var(--code-font);
+    font-size: 13px;
+    color: var(--color-text);
+    max-width: 100%;
+    overflow-x: auto;
+
+    .keyword { color: #7c3aed; }
+    .comp { color: #0369a1; }
+    .from { color: #6b7280; }
+    .pkg { color: #065f46; }
+  }
+}

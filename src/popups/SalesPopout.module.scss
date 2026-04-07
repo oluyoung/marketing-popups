@@ -1,0 +1,121 @@
+.content {
+  width: 460px;
+  max-width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  font-family: var(--font-body);
+  background: #fce7f3;
+  position: relative;
+}
+
+.spots {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+
+  .spot {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.35;
+  }
+
+  .s1 { width: 160px; height: 160px; background: #f9a8d4; top: -50px; right: -30px; }
+  .s2 { width: 100px; height: 100px; background: #fbcfe8; bottom: 40px; left: -20px; }
+  .s3 { width: 70px; height: 70px; background: #f472b6; top: 100px; left: 30px; opacity: 0.2; }
+  .s4 { width: 50px; height: 50px; background: #ec4899; bottom: 80px; right: 60px; opacity: 0.2; }
+  .s5 { width: 120px; height: 120px; background: #fda4af; bottom: -30px; right: 100px; opacity: 0.25; }
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  padding: 40px 36px 36px;
+  text-align: center;
+}
+
+.label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: white;
+  background: #111827;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.saleText {
+  font-family: var(--font-display);
+  font-size: 72px;
+  font-weight: 800;
+  color: #9b1c1c;
+  line-height: 0.95;
+  letter-spacing: -3px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  text-shadow: 3px 3px 0px rgba(155, 28, 28, 0.15);
+}
+
+.offText {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 800;
+  color: #111827;
+  line-height: 1;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.divider {
+  width: 40px;
+  height: 3px;
+  background: #111827;
+  border-radius: 2px;
+  margin: 0 auto 16px;
+}
+
+.caption {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+  margin-bottom: 28px;
+  font-weight: 500;
+
+  strong {
+    color: #111827;
+  }
+}
+
+.cta {
+  display: inline-block;
+  background: #111827;
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 14px 36px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  transition: background 0.2s, transform 0.1s;
+  width: 100%;
+
+  &:hover {
+    background: #1f2937;
+    transform: translateY(-2px);
+  }
+
+  &:active { transform: translateY(0); }
+}
+
+.fine {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #9ca3af;
+}

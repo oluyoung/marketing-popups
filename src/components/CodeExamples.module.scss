@@ -1,0 +1,42 @@
+.wrapper {
+  margin-top: 32px;
+  padding-top: 18px;
+}
+
+.header {
+  margin-bottom: 32px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--white-muted);
+}
+
+.mainHeading {
+  font-family: var(--text-font);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.3px;
+  margin: 0;
+  border: 0;
+}
+
+.intro {
+  margin: 0;
+}
+
+.group {
+  margin-bottom: 40px;
+}
+
+.groupTitle {
+  font-family: var(--text-font);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.groupDesc {
+  color: var(--white-muted);
+  line-height: 1.65;
+  margin-bottom: 16px;
+}

@@ -1,0 +1,172 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  @media (max-width: 768px) {
+    padding: 0 16px;
+  }
+}
+
+/* ── Sidebar ── */
+
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  padding: 20px 0 32px;
+  position: sticky;
+  top: var(--nav-height);
+  height: calc(100svh - var(--nav-height));
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: width 0.25s ease;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.sidebarCollapsed {
+  width: 40px;
+
+  .sidebarNav {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* Collapse toggle button */
+.collapseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: auto;
+  margin-bottom: 12px;
+  background: none;
+  border: 1px solid var(--white-muted);
+  cursor: pointer;
+  color: var(--white-muted);
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  position: sticky;
+  top: 0px;
+
+  &:hover {
+    color: var(--white);
+    background: var(--color-accent-light);
+    border-color: var(--color-accent);
+  }
+
+  /* Center the button when sidebar is collapsed to its narrow strip */
+  .sidebarCollapsed & {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Collapsible content wrapper */
+.sidebarNav {
+  transition: opacity 0.2s ease;
+}
+
+.sidebarSection {
+  margin-bottom: 28px;
+
+  .sidebarLabel {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--white);
+    padding: 0px 12px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+
+    &.active {
+      padding-top: 8px;
+      padding-bottom: 8px;
+      color: var(--white);
+      background: var(--bg-green);
+    }
+  }
+
+  .sidebarLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--white-muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    transition: color 0.15s, background 0.15s;
+    white-space: nowrap;
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--white-muted);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    &:hover {
+      color: var(--white);
+      background: var(--bg-green);
+      text-decoration: none;
+
+      .dot { background: var(--white); }
+    }
+
+    &.active {
+      color: var(--white);
+      background: var(--bg-green);
+      font-weight: 600;
+
+      .dot { background: var(--white); }
+    }
+  }
+}
+
+/* ── Main content ── */
+
+.main {
+  flex: 1;
+  padding: 40px 0 80px 40px;
+  min-width: 0;
+  border-left: 1px solid var(--white-muted);
+  transition: padding 0.25s ease, border-color 0.25s ease;
+
+  @media (max-width: 768px) {
+    padding: 24px 0 48px;
+    border-left: none;
+  }
+}
+
+/* Centered layout when sidebar is collapsed */
+.mainCentered {
+  border-left: none;
+  padding: 40px;
+  max-width: 860px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 24px 0 48px;
+    max-width: none;
+    margin: 0;
+  }
+}
