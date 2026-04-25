@@ -15,16 +15,19 @@ const prevNextPages = [
 const codeGroups = [
   {
     title: 'Basic usage',
-    description: 'The hook listens to the window scroll event and fires once the page has been scrolled past the given percentage.',
+    description: 'Pass onOpenChange to set your open state when the scroll threshold is crossed. Manage popup visibility separately with useState.',
     blocks: [
       {
         filename: 'useScrollTrigger with Popout',
-        code: `import { useScrollTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
+  const [open, setOpen] = useState(false)
+
   // Opens when the page is 50% scrolled
-  const [open, setOpen] = useScrollTrigger(50)
+  useScrollTrigger({ percent: 50, onOpenChange: setOpen })
 
   return (
     <Popout id="promo" open={open} onOpenChange={setOpen} animation="fade" lockScroll>
@@ -35,12 +38,15 @@ export default function App() {
       },
       {
         filename: 'useScrollTrigger with SlideIn',
-        code: `import { useScrollTrigger, SlideIn } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, SlideIn } from 'react-marketing-popups'
 import 'react-marketing-popups/SlideIn/style.css'
 
 export default function App() {
+  const [open, setOpen] = useState(false)
+
   // Slides in once the reader reaches 40% of the page
-  const [open, setOpen] = useScrollTrigger(40)
+  useScrollTrigger({ percent: 40, onOpenChange: setOpen })
 
   return (
     <SlideIn id="offer" open={open} onOpenChange={setOpen} position="left" animation="slide">
@@ -51,12 +57,15 @@ export default function App() {
       },
       {
         filename: 'useScrollTrigger with Banner',
-        code: `import { useScrollTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, Banner } from 'react-marketing-popups'
 import 'react-marketing-popups/Banner/style.css'
 
 export default function App() {
+  const [open, setOpen] = useState(false)
+
   // Banner appears when the user is 60% through the page
-  const [open, setOpen] = useScrollTrigger(60)
+  useScrollTrigger({ percent: 60, onOpenChange: setOpen })
 
   return (
     <Banner id="cta" open={open} onOpenChange={setOpen} position="bottom" animation="slide">
@@ -74,17 +83,20 @@ export default function App() {
       {
         filename: 'Low threshold — catch early attention',
         code: `// 25% — fires near the top of the page, good for lead-gen
-const [open, setOpen] = useScrollTrigger(25)`,
+const [open, setOpen] = useState(false)
+useScrollTrigger({ percent: 25, onOpenChange: setOpen })`,
       },
       {
         filename: 'High threshold — catch engaged readers',
         code: `// 75% — user is clearly reading; good for content upgrades
-const [open, setOpen] = useScrollTrigger(75)`,
+const [open, setOpen] = useState(false)
+useScrollTrigger({ percent: 75, onOpenChange: setOpen })`,
       },
       {
         filename: 'Near bottom — last-chance CTA',
         code: `// 90% — user reached the bottom; ideal for a final CTA or offer
-const [open, setOpen] = useScrollTrigger(90)`,
+const [open, setOpen] = useState(false)
+useScrollTrigger({ percent: 90, onOpenChange: setOpen })`,
       },
     ],
   },
@@ -94,20 +106,18 @@ const [open, setOpen] = useScrollTrigger(90)`,
     blocks: [
       {
         filename: 'Show once per visitor',
-        code: `import { useScrollTrigger, usePersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, usePersistence, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
-  const [open, setOpen] = useScrollTrigger(50)
   const { hasSeen, markSeen } = usePersistence('scroll-promo')
+  const [open, setOpen] = useState(false)
 
-  // Mark as seen on first fire so it never shows again
-  if (open && !hasSeen()) {
-    markSeen()
-  }
+  useScrollTrigger({ percent: 50, onOpenChange: setOpen })
 
   return (
-    <Popout id="scroll-promo" open={open} onOpenChange={setOpen} animation="fade" lockScroll>
+    <Popout id="scroll-promo" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="fade" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -131,10 +141,10 @@ export default function UseScrollTriggerPage() {
       <h1>useScrollTrigger</h1>
 
       <p className={styles.lead}>
-        Fires when the user scrolls past a percentage of the page. Returns an{' '}
-        <code>[open, setOpen]</code> tuple that you wire to any popup component.
-        The hook listens to the window scroll event and sets <code>open</code> to{' '}
-        <code>true</code> once the threshold is crossed.
+        Fires when the user scrolls past a percentage of the page. Pass{' '}
+        <code>onOpenChange</code> to update your popup's open state. The hook
+        listens to the window scroll event and calls <code>onOpenChange(true)</code>{' '}
+        once the threshold is crossed.
       </p>
 
       <div className={styles.importRow}>
@@ -153,7 +163,7 @@ export default function UseScrollTriggerPage() {
       <div className={styles.returnsBox}>
         <div>
           <span className={styles.returnType}>useScrollTrigger</span>
-          <span>{'(percent?: number)'}</span>
+          <span>{'({ percent?, onOpenChange? })'}</span>
         </div>
         <div className={styles.returnDesc}>
           Returns <code>readonly [boolean, Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;]</code>
@@ -178,6 +188,12 @@ export default function UseScrollTriggerPage() {
             <td><code>50</code></td>
             <td>Page scroll depth (0–100) at which the trigger fires</td>
           </tr>
+          <tr>
+            <td>onOpenChange</td>
+            <td><code>(v: boolean) =&gt; void</code></td>
+            <td>—</td>
+            <td>Called with <code>true</code> when the scroll threshold is crossed. Wire to your popup's open state setter.</td>
+          </tr>
         </tbody>
       </table>
 
@@ -185,15 +201,15 @@ export default function UseScrollTriggerPage() {
 
       <div className={styles.methodList}>
         <div className={styles.method}>
-          <span className={styles.methodSig}>open</span>
+          <span className={styles.methodSig}>fired</span>
           <span className={styles.methodDesc}>
-            <code>boolean</code> — whether the popup should be visible. Starts as <code>false</code>, becomes <code>true</code> once the scroll threshold is crossed.
+            <code>boolean</code> — whether the trigger has fired. Starts as <code>false</code>, becomes <code>true</code> once the scroll threshold is crossed.
           </span>
         </div>
         <div className={styles.method}>
-          <span className={styles.methodSig}>setOpen</span>
+          <span className={styles.methodSig}>setFired</span>
           <span className={styles.methodDesc}>
-            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — standard state setter. Pass directly as <code>onOpenChange</code>, or call <code>setOpen(false)</code> in your close handler.
+            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — rarely needed directly; the hook manages this internally. Use a separate <code>useState</code> for popup visibility.
           </span>
         </div>
       </div>

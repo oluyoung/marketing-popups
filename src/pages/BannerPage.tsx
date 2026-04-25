@@ -22,15 +22,13 @@ const bannerProps = [
   { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Callback when open state changes' },
   { name: 'position', type: '"top" | "bottom" | "left" | "right"', description: 'Banner placement', default: '"bottom"' },
   { name: 'animation', type: '"fade" | "slide" | "bounce"', description: 'Animation style', default: '"slide"' },
-  { name: 'trigger', type: '"timer" | "scroll" | "exit" | "inactivity"', description: 'Built-in trigger type' },
-  { name: 'triggerProps', type: 'object | number', description: 'Options for the trigger — object for timer/exit, number for scroll/inactivity' },
 ]
 
 const codeGroups = [
   {
-    title: 'Core Banner with trigger prop',
+    title: 'Core Banner',
     description:
-      'Use the trigger prop directly on Banner to fire automatically. Pass triggerProps to configure timing or thresholds — a plain number for scroll and inactivity, an object for timer and exit.',
+      'Use Banner directly — manage open state with useState and wire it to onOpenChange.',
     blocks: [
       {
         filename: 'MyBanner.tsx',
@@ -39,7 +37,9 @@ const codeGroups = [
 import { Banner } from 'react-marketing-popups'
 import 'react-marketing-popups/Banner/style.css'
 
-export default function MyBanner({ open, setOpen }) {
+export default function MyBanner() {
+  const [open, setOpen] = useState(false)
+
   return (
     <Banner
       id="my-banner"
@@ -58,20 +58,20 @@ export default function MyBanner({ open, setOpen }) {
   {
     title: 'Trigger hooks',
     description:
-      'Use hooks directly for full control over when and how the banner fires. Each returns [fired, setFired].',
+      'Use hooks for automatic triggering. Pass onOpenChange to wire the hook to your open state. Each hook also returns [fired, setFired] if you need to track whether it has fired.',
     blocks: [
       {
         filename: 'MyTimerBanner.tsx',
-        code: `
+        code: `import { useState } from 'react'
 // import { Banner } from 'react-marketing-popups/Banner'
 // import { useTimerTrigger } from 'react-marketing-popups/hooks/useTimerTrigger'
 import { useTimerTrigger, Banner } from 'react-marketing-popups'
 import 'react-marketing-popups/Banner/style.css'
 
 export function MyTimerBanner() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
-  // Fires after 4000ms
+  // Fires after 3000ms
   useTimerTrigger({ ms: 3000, onOpenChange: setOpen })
 
   return (
@@ -83,11 +83,14 @@ export function MyTimerBanner() {
       },
       {
         filename: 'MyScrollBanner.tsx',
-        code: `import { useScrollTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, Banner } from 'react-marketing-popups'
 
 export function MyScrollBanner() {
+  const [open, setOpen] = useState(false)
+
   // Fires when the user has scrolled 50% down the page
-  const [open, setOpen] = useScrollTrigger(50)
+  useScrollTrigger({ percent: 50, onOpenChange: setOpen })
 
   return (
     <Banner id="promo" open={open} onOpenChange={setOpen} position="bottom" animation="slide">
@@ -98,12 +101,15 @@ export function MyScrollBanner() {
       },
       {
         filename: 'MyExitBanner.tsx',
-        code: `import { useExitTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, Banner } from 'react-marketing-popups'
 
 export function MyExitBanner() {
-  // opts: { topZonePx?: number, delayMs?: number, once?: boolean }
+  const [open, setOpen] = useState(false)
+
+  // opts: { topZonePx?, delayMs?, once?, onOpenChange }
   // Fires when the mouse exits through the top of the viewport
-  const [open, setOpen] = useExitTrigger({ topZonePx: 20, delayMs: 300, once: true })
+  useExitTrigger({ topZonePx: 20, delayMs: 300, once: true, onOpenChange: setOpen })
 
   return (
     <Banner id="promo" open={open} onOpenChange={setOpen} position="top" animation="fade">
@@ -114,11 +120,14 @@ export function MyExitBanner() {
       },
       {
         filename: 'MyInactivityBanner.tsx',
-        code: `import { useInactivityTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useInactivityTrigger, Banner } from 'react-marketing-popups'
 
 export function MyInactivityBanner() {
+  const [open, setOpen] = useState(false)
+
   // Fires after 8 000 ms of no mouse or keyboard activity
-  const [open, setOpen] = useInactivityTrigger(8000)
+  useInactivityTrigger({ ms: 8000, onOpenChange: setOpen })
 
   return (
     <Banner id="promo" open={open} onOpenChange={setOpen} position="bottom" animation="bounce">
@@ -129,16 +138,17 @@ export function MyInactivityBanner() {
       },
       {
         filename: 'MyPersistedBanner.tsx',
-        code: `// import { useFiredPersistence } from 'react-marketing-popups/hooks/useFiredPersistence'
-import { useFiredPersistence, useTimerTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+// import { useTriggerPersistence } from 'react-marketing-popups/hooks/useTriggerPersistence'
+import { useTimerTrigger, useTriggerPersistence, Banner } from 'react-marketing-popups'
 
 export function MyPersistedBanner() {
-  const [open, setOpen] = useState(true)
-  const [fired] = useTimerTrigger(4000)
-  useFiredPersistence({ id: "my-persisted-banner", fired, open, onOpenChange: setOpen });
+  const [open, setOpen] = useState(false)
+  const [fired] = useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
+  const { hasSeen } = useTriggerPersistence({ id: 'my-persisted-banner', fired, open })
 
   return (
-    <Banner id="promo" open={fired && open} onOpenChange={setOpen} position="bottom" animation="slide">
+    <Banner id="my-persisted-banner" open={open && !hasSeen()} onOpenChange={setOpen} position="bottom" animation="slide">
       <YourContent onClose={() => setOpen(false)} />
     </Banner>
   )

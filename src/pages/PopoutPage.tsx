@@ -20,8 +20,6 @@ const popoutProps = [
   { name: 'id', type: 'string', description: 'Unique key for persistence tracking' },
   { name: 'open', type: 'boolean', description: 'Controls visibility', default: 'false' },
   { name: 'onOpenChange', type: '(open: boolean) => void', description: 'Callback when open state changes' },
-  { name: 'trigger', type: '"timer" | "scroll" | "exit" | "inactivity"', description: 'Built-in trigger type' },
-  { name: 'triggerProps', type: 'object | number', description: 'Options for the trigger — object for timer/exit, number for scroll/inactivity' },
   { name: 'animation', type: '"fade" | "zoom" | "bounce"', description: 'Open/close animation', default: '"zoom"' },
   { name: 'lockScroll', type: 'boolean', description: 'Lock body scroll while open', default: 'false' },
   { name: 'closeOnOverlay', type: 'boolean', description: 'Close on overlay click', default: 'true' },
@@ -31,7 +29,7 @@ const codeGroups = [
   {
     title: 'Core',
     description:
-      'Use the Popout directly.',
+      'Use the Popout directly — manage open state with useState and wire it to onOpenChange.',
     blocks: [
       {
         filename: 'MyPopout.tsx',
@@ -40,7 +38,9 @@ const codeGroups = [
 import { Popout } from 'react-marketing-popups';
 import 'react-marketing-popups/Popout/style.css';
 
-export const MyPopout = ({ open, setOpen }) => {
+export const MyPopout = () => {
+  const [open, setOpen] = useState(false)
+
   return (
     <Popout
       id="promo-timer"
@@ -60,23 +60,24 @@ export const MyPopout = ({ open, setOpen }) => {
   {
     title: 'Trigger hooks',
     description:
-      'Use hooks directly for full control over when and how the popup fires. Each returns [fired, setFired].',
+      'Use hooks for automatic triggering. Pass onOpenChange to wire the hook to your open state. Each hook also returns [fired, setFired] if you need to track whether it has fired.',
     blocks: [
       {
         filename: 'MyTimerPopout.tsx',
-        code: `// import { Popout } from 'react-marketing-popups/Popout'
+        code: `import { useState } from 'react'
+// import { Popout } from 'react-marketing-popups/Popout'
 // import { useTimerTrigger } from 'react-marketing-popups/hooks/useTimerTrigger'
 import { useTimerTrigger, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export function MyTimerPopout() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   // Fires after 4000ms
-  const [fired] = useTimerTrigger(4000)
+  useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
 
   return (
-    <Popout id="promo" open={fired && open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="promo" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -84,16 +85,17 @@ export function MyTimerPopout() {
       },
       {
         filename: 'MyScrollPopout.tsx',
-        code: `import { useScrollTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, Popout } from 'react-marketing-popups'
 
 export function MyScrollPopout() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   // Fires when the user has scrolled 50% down the page
-  const [fired] = useScrollTrigger(50);
+  useScrollTrigger({ percent: 50, onOpenChange: setOpen })
 
   return (
-    <Popout id="promo" open={fired && open} onOpenChange={setOpen} animation="fade" lockScroll>
+    <Popout id="promo" open={open} onOpenChange={setOpen} animation="fade" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -101,17 +103,18 @@ export function MyScrollPopout() {
       },
       {
         filename: 'MyExitPopout.tsx',
-        code: `import { useExitTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, Popout } from 'react-marketing-popups'
 
 export function MyExitPopout() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
-  // opts: { topZonePx?: number, delayMs?: number, once?: boolean }
+  // opts: { topZonePx?, delayMs?, once?, onOpenChange }
   // Fires when the mouse exits through the top of the viewport
-  const [fired] = useExitTrigger({ topZonePx: 20, delayMs: 300, once: true })
+  useExitTrigger({ topZonePx: 20, delayMs: 300, once: true, onOpenChange: setOpen })
 
   return (
-    <Popout id="promo" open={fired && open} onOpenChange={setOpen} animation="bounce" lockScroll>
+    <Popout id="promo" open={open} onOpenChange={setOpen} animation="bounce" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -119,16 +122,17 @@ export function MyExitPopout() {
       },
       {
         filename: 'MyInactivityPopout.tsx',
-        code: `import { useInactivityTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useInactivityTrigger, Popout } from 'react-marketing-popups'
 
 export default function MyInactivityPopout() {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   // Fires after 5000ms of no mouse or keyboard activity
-  const [fired] = useInactivityTrigger(5000)
+  useInactivityTrigger({ ms: 5000, onOpenChange: setOpen })
 
   return (
-    <Popout id="promo" open={fired && open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="promo" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -136,16 +140,17 @@ export default function MyInactivityPopout() {
       },
       {
         filename: 'MyPersistedPopout.tsx',
-        code: `// import { useFiredPersistence } from 'react-marketing-popups/hooks/useFiredPersistence'
-        import { useTimerTrigger, useFiredPersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+// import { useTriggerPersistence } from 'react-marketing-popups/hooks/useTriggerPersistence'
+import { useTimerTrigger, useTriggerPersistence, Popout } from 'react-marketing-popups'
 
 export default function MyPersistedPopout() {
-  const [open, setOpen] = useState(true)
-  const [fired] = useTimerTrigger(4000)
-  useFiredPersistence({ id: "my-persisted-popout", fired, open, onOpenChange: setOpen });
+  const [open, setOpen] = useState(false)
+  const [fired] = useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
+  const { hasSeen } = useTriggerPersistence({ id: 'my-persisted-popout', fired, open })
 
   return (
-    <Popout id="promo" open={fired && open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="my-persisted-popout" open={open && !hasSeen()} onOpenChange={setOpen} animation="zoom" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )

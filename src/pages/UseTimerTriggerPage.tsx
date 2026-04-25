@@ -14,16 +14,19 @@ const prevNextPages = [
 const codeGroups = [
   {
     title: 'Basic usage',
-    description: 'The hook returns an [open, setOpen] tuple. Wire it to any component — the popup opens automatically after the delay.',
+    description: 'Pass onOpenChange to set your open state when the timer fires. Manage popup visibility separately with useState.',
     blocks: [
       {
         filename: 'useTimerTrigger with Popout',
-        code: `import { useTimerTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
+  const [open, setOpen] = useState(false)
+
   // Opens automatically after 4 000 ms
-  const [open, setOpen] = useTimerTrigger(4000)
+  useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
 
   return (
     <Popout id="promo" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
@@ -34,11 +37,14 @@ export default function App() {
       },
       {
         filename: 'useTimerTrigger with SlideIn',
-        code: `import { useTimerTrigger, SlideIn } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, SlideIn } from 'react-marketing-popups'
 import 'react-marketing-popups/SlideIn/style.css'
 
 export default function App() {
-  const [open, setOpen] = useTimerTrigger(6000)
+  const [open, setOpen] = useState(false)
+
+  useTimerTrigger({ ms: 6000, onOpenChange: setOpen })
 
   return (
     <SlideIn id="offer" open={open} onOpenChange={setOpen} position="left" animation="slide">
@@ -49,11 +55,14 @@ export default function App() {
       },
       {
         filename: 'useTimerTrigger with Banner',
-        code: `import { useTimerTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, Banner } from 'react-marketing-popups'
 import 'react-marketing-popups/Banner/style.css'
 
 export default function App() {
-  const [open, setOpen] = useTimerTrigger(3000)
+  const [open, setOpen] = useState(false)
+
+  useTimerTrigger({ ms: 3000, onOpenChange: setOpen })
 
   return (
     <Banner id="announcement" open={open} onOpenChange={setOpen} position="bottom" animation="slide">
@@ -65,61 +74,23 @@ export default function App() {
     ],
   },
   {
-    title: 'Conditional firing with enabled',
-    description: 'Pass false as the second argument to pause the timer. Useful for gating the trigger on auth state, A/B tests, or feature flags.',
-    blocks: [
-      {
-        filename: 'Only fire for authenticated users',
-        code: `import { useTimerTrigger, Popout } from 'react-marketing-popups'
-
-export default function App() {
-  const isLoggedIn = useAuth()
-
-  // Timer only starts when isLoggedIn is true
-  const [open, setOpen] = useTimerTrigger(5000, isLoggedIn)
-
-  return (
-    <Popout id="upsell" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
-      <UpsellContent onClose={() => setOpen(false)} />
-    </Popout>
-  )
-}`,
-      },
-      {
-        filename: 'A/B test — show to 50% of visitors',
-        code: `import { useTimerTrigger, Popout } from 'react-marketing-popups'
-
-export default function App() {
-  // Randomly enable for half of visitors (evaluated once on mount)
-  const [inVariant] = useState(() => Math.random() < 0.5)
-  const [open, setOpen] = useTimerTrigger(4000, inVariant)
-
-  return (
-    <Popout id="ab-promo" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
-      <PromoContent onClose={() => setOpen(false)} />
-    </Popout>
-  )
-}`,
-      },
-    ],
-  },
-  {
     title: 'Combined with usePersistence',
     description: 'Pair with usePersistence to show the popup only once — even across page reloads.',
     blocks: [
       {
         filename: 'Show once per visitor (localStorage)',
-        code: `import { useTimerTrigger, usePersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, usePersistence, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
-  const { hasSeen } = usePersistence('welcome-popup')
+  const { hasSeen, markSeen } = usePersistence('welcome-popup')
+  const [open, setOpen] = useState(false)
 
-  // Don't start the timer at all if already seen
-  const [open, setOpen] = useTimerTrigger(4000, !hasSeen())
+  useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
 
   return (
-    <Popout id="welcome-popup" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="welcome-popup" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="zoom" lockScroll>
       <WelcomeContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -143,9 +114,9 @@ export default function UseTimerTriggerPage() {
       <h1>useTimerTrigger</h1>
 
       <p className={styles.lead}>
-        Fires after a fixed delay. Returns an <code>[open, setOpen]</code> tuple that
-        you wire to any popup component. The timer starts on mount and calls{' '}
-        <code>setOpen(true)</code> once after <code>ms</code> milliseconds.
+        Fires after a fixed delay. Pass <code>onOpenChange</code> to wire it to your
+        popup's open state. The timer starts on mount and calls{' '}
+        <code>onOpenChange(true)</code> once after <code>ms</code> milliseconds.
       </p>
 
       <div className={styles.importRow}>
@@ -164,7 +135,7 @@ export default function UseTimerTriggerPage() {
       <div className={styles.returnsBox}>
         <div>
           <span className={styles.returnType}>useTimerTrigger</span>
-          <span>{'(ms?: number, enabled?: boolean)'}</span>
+          <span>{'({ ms?, onOpenChange? })'}</span>
         </div>
         <div className={styles.returnDesc}>
           Returns <code>readonly [boolean, Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;]</code>
@@ -187,13 +158,13 @@ export default function UseTimerTriggerPage() {
             <td>ms</td>
             <td><code>number</code></td>
             <td><code>3000</code></td>
-            <td>Milliseconds to wait before setting open to true</td>
+            <td>Milliseconds to wait before the trigger fires</td>
           </tr>
           <tr>
-            <td>enabled</td>
-            <td><code>boolean</code></td>
-            <td><code>true</code></td>
-            <td>When false the timer does not start. Useful for conditional firing.</td>
+            <td>onOpenChange</td>
+            <td><code>(v: boolean) =&gt; void</code></td>
+            <td>—</td>
+            <td>Called with <code>true</code> when the timer fires. Wire to your popup's open state setter.</td>
           </tr>
         </tbody>
       </table>
@@ -202,15 +173,15 @@ export default function UseTimerTriggerPage() {
 
       <div className={styles.methodList}>
         <div className={styles.method}>
-          <span className={styles.methodSig}>open</span>
+          <span className={styles.methodSig}>fired</span>
           <span className={styles.methodDesc}>
-            <code>boolean</code> — whether the popup should be visible. Starts as <code>false</code>, becomes <code>true</code> after the timer fires.
+            <code>boolean</code> — whether the timer has fired. Starts as <code>false</code>, becomes <code>true</code> after the delay elapses.
           </span>
         </div>
         <div className={styles.method}>
-          <span className={styles.methodSig}>setOpen</span>
+          <span className={styles.methodSig}>setFired</span>
           <span className={styles.methodDesc}>
-            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — standard state setter. Pass directly as <code>onOpenChange</code>, or call <code>setOpen(false)</code> in your close handler.
+            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — rarely needed directly; the hook manages this internally. Use a separate <code>useState</code> for popup visibility.
           </span>
         </div>
       </div>

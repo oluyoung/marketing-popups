@@ -12,25 +12,22 @@ const prevNextPages = [
 const codeGroups = [
   {
     title: 'Basic usage',
-    description: 'Pair usePersistence with any trigger hook. Use hasSeen to guard the trigger and markSeen to record the first display.',
+    description: 'Pair usePersistence with any trigger hook. Gate open with hasSeen() and call markSeen via onClose so it records on first dismissal.',
     blocks: [
       {
         filename: 'Show once — timer trigger',
-        code: `import { useTimerTrigger, usePersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, usePersistence, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
   const { hasSeen, markSeen } = usePersistence('welcome-popup')
+  const [open, setOpen] = useState(false)
 
-  // Don't start the timer if the user has already seen the popup
-  const [open, setOpen] = useTimerTrigger(4000, !hasSeen())
-
-  if (open && !hasSeen()) {
-    markSeen()
-  }
+  useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
 
   return (
-    <Popout id="welcome-popup" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="welcome-popup" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="zoom" lockScroll>
       <WelcomeContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -38,22 +35,22 @@ export default function App() {
       },
       {
         filename: 'Show once — scroll trigger',
-        code: `import { useScrollTrigger, usePersistence, SlideIn } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useScrollTrigger, usePersistence, SlideIn } from 'react-marketing-popups'
 import 'react-marketing-popups/SlideIn/style.css'
 
 export default function App() {
   const { hasSeen, markSeen } = usePersistence('scroll-offer')
-  const [open, setOpen] = useScrollTrigger(50)
+  const [open, setOpen] = useState(false)
 
-  if (open && !hasSeen()) {
-    markSeen()
-  }
+  useScrollTrigger({ percent: 50, onOpenChange: setOpen })
 
   return (
     <SlideIn
       id="scroll-offer"
       open={open && !hasSeen()}
       onOpenChange={setOpen}
+      onClose={markSeen}
       position="left"
       animation="slide"
     >
@@ -64,19 +61,18 @@ export default function App() {
       },
       {
         filename: 'Show once — exit intent',
-        code: `import { useExitTrigger, usePersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, usePersistence, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
   const { hasSeen, markSeen } = usePersistence('exit-popup')
-  const [open, setOpen] = useExitTrigger({ topZonePx: 20, delayMs: 300 })
+  const [open, setOpen] = useState(false)
 
-  if (open && !hasSeen()) {
-    markSeen()
-  }
+  useExitTrigger({ topZonePx: 20, delayMs: 300, onOpenChange: setOpen })
 
   return (
-    <Popout id="exit-popup" open={open && !hasSeen()} onOpenChange={setOpen} animation="bounce" lockScroll>
+    <Popout id="exit-popup" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="bounce" lockScroll>
       <ExitContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -90,7 +86,8 @@ export default function App() {
     blocks: [
       {
         filename: 'Re-show after 7 days',
-        code: `import { useTimerTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 const COOLDOWN_DAYS = 7
@@ -109,14 +106,12 @@ function recordShown() {
 
 export default function App() {
   const cooldownPassed = hasCooldowned()
-  const [open, setOpen] = useTimerTrigger(4000, cooldownPassed)
+  const [open, setOpen] = useState(false)
 
-  if (open && cooldownPassed) {
-    recordShown()
-  }
+  useTimerTrigger({ ms: 4000, onOpenChange: setOpen })
 
   return (
-    <Popout id="promo" open={open && cooldownPassed} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="promo" open={open && cooldownPassed} onOpenChange={setOpen} onClose={recordShown} animation="zoom" lockScroll>
       <PromoContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -130,12 +125,14 @@ export default function App() {
     blocks: [
       {
         filename: 'Reset with a keyboard shortcut',
-        code: `import { usePersistence, useTimerTrigger, Popout } from 'react-marketing-popups'
-import { useEffect } from 'react'
+        code: `import { useState, useEffect } from 'react'
+import { usePersistence, useTimerTrigger, Popout } from 'react-marketing-popups'
 
 export default function App() {
   const { hasSeen, markSeen, clear } = usePersistence('dev-popup')
-  const [open, setOpen] = useTimerTrigger(2000, !hasSeen())
+  const [open, setOpen] = useState(false)
+
+  useTimerTrigger({ ms: 2000, onOpenChange: setOpen })
 
   // Press Shift+R in development to reset the seen flag
   useEffect(() => {
@@ -147,10 +144,8 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler)
   }, [clear])
 
-  if (open && !hasSeen()) markSeen()
-
   return (
-    <Popout id="dev-popup" open={open} onOpenChange={setOpen} animation="zoom" lockScroll>
+    <Popout id="dev-popup" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="zoom" lockScroll>
       <DevContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -174,30 +169,31 @@ useEffect(() => {
     blocks: [
       {
         filename: 'Three independent popups',
-        code: `import { useTimerTrigger, usePersistence, Popout, Banner, SlideIn } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useTimerTrigger, useScrollTrigger, useExitTrigger, usePersistence, Popout, Banner, SlideIn } from 'react-marketing-popups'
 
 export default function App() {
-  const welcome  = usePersistence('welcome-popup')
-  const offer    = usePersistence('scroll-offer')
-  const exit     = usePersistence('exit-banner')
+  const welcome = usePersistence('welcome-popup')
+  const offer   = usePersistence('scroll-offer')
+  const exit    = usePersistence('exit-banner')
 
-  const [popoutOpen, setPopoutOpen] = useTimerTrigger(3000, !welcome.hasSeen())
-  const [slideOpen,  setSlideOpen]  = useScrollTrigger(50,  !offer.hasSeen())
-  const [bannerOpen, setBannerOpen] = useExitTrigger()
+  const [popoutOpen, setPopoutOpen] = useState(false)
+  const [slideOpen,  setSlideOpen]  = useState(false)
+  const [bannerOpen, setBannerOpen] = useState(false)
 
-  if (popoutOpen && !welcome.hasSeen()) welcome.markSeen()
-  if (slideOpen  && !offer.hasSeen())   offer.markSeen()
-  if (bannerOpen && !exit.hasSeen())    exit.markSeen()
+  useTimerTrigger({ ms: 3000, onOpenChange: setPopoutOpen })
+  useScrollTrigger({ percent: 50, onOpenChange: setSlideOpen })
+  useExitTrigger({ onOpenChange: setBannerOpen })
 
   return (
     <>
-      <Popout id="welcome-popup" open={popoutOpen} onOpenChange={setPopoutOpen} animation="zoom" lockScroll>
+      <Popout id="welcome-popup" open={popoutOpen && !welcome.hasSeen()} onOpenChange={setPopoutOpen} onClose={welcome.markSeen} animation="zoom" lockScroll>
         <WelcomeContent />
       </Popout>
-      <SlideIn id="scroll-offer" open={slideOpen} onOpenChange={setSlideOpen} position="left" animation="slide">
+      <SlideIn id="scroll-offer" open={slideOpen && !offer.hasSeen()} onOpenChange={setSlideOpen} onClose={offer.markSeen} position="left" animation="slide">
         <OfferContent />
       </SlideIn>
-      <Banner id="exit-banner" open={bannerOpen && !exit.hasSeen()} onOpenChange={setBannerOpen} position="top" animation="fade">
+      <Banner id="exit-banner" open={bannerOpen && !exit.hasSeen()} onOpenChange={setBannerOpen} onClose={exit.markSeen} position="top" animation="fade">
         <ExitContent />
       </Banner>
     </>

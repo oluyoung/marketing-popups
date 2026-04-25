@@ -12,16 +12,19 @@ const prevNextPages = [
 const codeGroups = [
   {
     title: 'Basic usage',
-    description: 'Works out of the box with no options. Fires when the mouse moves into the top zone of the viewport — the classic exit-intent signal.',
+    description: 'Pass onOpenChange to set your open state when exit intent is detected. Manage popup visibility separately with useState.',
     blocks: [
       {
         filename: 'useExitTrigger with Popout',
-        code: `import { useExitTrigger, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
+  const [open, setOpen] = useState(false)
+
   // Fires when the mouse exits through the top of the viewport
-  const [open, setOpen] = useExitTrigger()
+  useExitTrigger({ onOpenChange: setOpen })
 
   return (
     <Popout id="exit-promo" open={open} onOpenChange={setOpen} animation="bounce" lockScroll>
@@ -32,11 +35,14 @@ export default function App() {
       },
       {
         filename: 'useExitTrigger with SlideIn',
-        code: `import { useExitTrigger, SlideIn } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, SlideIn } from 'react-marketing-popups'
 import 'react-marketing-popups/SlideIn/style.css'
 
 export default function App() {
-  const [open, setOpen] = useExitTrigger()
+  const [open, setOpen] = useState(false)
+
+  useExitTrigger({ onOpenChange: setOpen })
 
   return (
     <SlideIn id="exit-offer" open={open} onOpenChange={setOpen} position="right" animation="fade">
@@ -47,11 +53,14 @@ export default function App() {
       },
       {
         filename: 'useExitTrigger with Banner',
-        code: `import { useExitTrigger, Banner } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, Banner } from 'react-marketing-popups'
 import 'react-marketing-popups/Banner/style.css'
 
 export default function App() {
-  const [open, setOpen] = useExitTrigger()
+  const [open, setOpen] = useState(false)
+
+  useExitTrigger({ onOpenChange: setOpen })
 
   return (
     <Banner id="exit-banner" open={open} onOpenChange={setOpen} position="top" animation="slide">
@@ -70,26 +79,31 @@ export default function App() {
         filename: 'Custom topZonePx — tighter detection zone',
         code: `// topZonePx: 20 — only fires when mouse is within 20 px of the top edge
 // Good for reducing false positives on large monitors
-const [open, setOpen] = useExitTrigger({ topZonePx: 20 })`,
+const [open, setOpen] = useState(false)
+useExitTrigger({ topZonePx: 20, onOpenChange: setOpen })`,
       },
       {
         filename: 'delayMs — debounce accidental triggers',
         code: `// delayMs: 300 — mouse must stay in the top zone for 300 ms before firing
 // Prevents the popup from flashing on quick cursor movements
-const [open, setOpen] = useExitTrigger({ topZonePx: 20, delayMs: 300 })`,
+const [open, setOpen] = useState(false)
+useExitTrigger({ topZonePx: 20, delayMs: 300, onOpenChange: setOpen })`,
       },
       {
         filename: 'once: false — fire on every exit',
         code: `// once: false — fires each time the user moves to exit, not just the first time
 // The default is true (fires once per page load)
-const [open, setOpen] = useExitTrigger({ once: false })`,
+const [open, setOpen] = useState(false)
+useExitTrigger({ once: false, onOpenChange: setOpen })`,
       },
       {
         filename: 'All options together',
-        code: `const [open, setOpen] = useExitTrigger({
-  topZonePx: 20,   // detection zone height in pixels (default: 50)
-  delayMs: 300,    // debounce delay in ms (default: 0)
-  once: true,      // fire only once per page load (default: true)
+        code: `const [open, setOpen] = useState(false)
+useExitTrigger({
+  topZonePx: 20,          // detection zone height in pixels (default: 50)
+  delayMs: 300,           // debounce delay in ms (default: 0)
+  once: true,             // fire only once per page load (default: true)
+  onOpenChange: setOpen,  // called with true when exit intent fires
 })`,
       },
     ],
@@ -100,21 +114,18 @@ const [open, setOpen] = useExitTrigger({ once: false })`,
     blocks: [
       {
         filename: 'Show exit popup only once per visitor',
-        code: `import { useExitTrigger, usePersistence, Popout } from 'react-marketing-popups'
+        code: `import { useState } from 'react'
+import { useExitTrigger, usePersistence, Popout } from 'react-marketing-popups'
 import 'react-marketing-popups/Popout/style.css'
 
 export default function App() {
   const { hasSeen, markSeen } = usePersistence('exit-promo')
+  const [open, setOpen] = useState(false)
 
-  // Don't even listen if already seen
-  const [open, setOpen] = useExitTrigger({ topZonePx: 20, delayMs: 300 })
-
-  if (open && !hasSeen()) {
-    markSeen()
-  }
+  useExitTrigger({ topZonePx: 20, delayMs: 300, onOpenChange: setOpen })
 
   return (
-    <Popout id="exit-promo" open={open && !hasSeen()} onOpenChange={setOpen} animation="bounce" lockScroll>
+    <Popout id="exit-promo" open={open && !hasSeen()} onOpenChange={setOpen} onClose={markSeen} animation="bounce" lockScroll>
       <YourContent onClose={() => setOpen(false)} />
     </Popout>
   )
@@ -139,8 +150,9 @@ export default function UseExitTriggerPage() {
 
       <p className={styles.lead}>
         Fires when the user's mouse moves toward the top of the viewport — the
-        classic exit-intent signal. Returns an <code>[open, setOpen]</code> tuple.
-        By default it fires once per page load and only on desktop (no mouse on touch devices).
+        classic exit-intent signal. Pass <code>onOpenChange</code> to update your
+        popup's open state. By default it fires once per page load and only on
+        desktop (no mouse on touch devices).
       </p>
 
       <div className={styles.importRow}>
@@ -159,7 +171,7 @@ export default function UseExitTriggerPage() {
       <div className={styles.returnsBox}>
         <div>
           <span className={styles.returnType}>useExitTrigger</span>
-          <span>{'(opts?: { topZonePx?: number; delayMs?: number; once?: boolean })'}</span>
+          <span>{'(opts?: { topZonePx?: number; delayMs?: number; once?: boolean; onOpenChange?: (v: boolean) => void })'}</span>
         </div>
         <div className={styles.returnDesc}>
           Returns <code>readonly [boolean, Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;]</code>
@@ -196,6 +208,12 @@ export default function UseExitTriggerPage() {
             <td><code>true</code></td>
             <td>When true the trigger fires only once per page load; set to false to re-fire on each exit movement</td>
           </tr>
+          <tr>
+            <td>onOpenChange</td>
+            <td><code>(v: boolean) =&gt; void</code></td>
+            <td>—</td>
+            <td>Called with <code>true</code> when exit intent is detected. Wire to your popup's open state setter.</td>
+          </tr>
         </tbody>
       </table>
 
@@ -203,15 +221,15 @@ export default function UseExitTriggerPage() {
 
       <div className={styles.methodList}>
         <div className={styles.method}>
-          <span className={styles.methodSig}>open</span>
+          <span className={styles.methodSig}>fired</span>
           <span className={styles.methodDesc}>
-            <code>boolean</code> — whether the popup should be visible. Starts as <code>false</code>, becomes <code>true</code> when exit intent is detected.
+            <code>boolean</code> — whether the trigger has fired. Starts as <code>false</code>, becomes <code>true</code> when exit intent is detected.
           </span>
         </div>
         <div className={styles.method}>
-          <span className={styles.methodSig}>setOpen</span>
+          <span className={styles.methodSig}>setFired</span>
           <span className={styles.methodDesc}>
-            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — standard state setter. Pass directly as <code>onOpenChange</code>, or call <code>setOpen(false)</code> in your close handler.
+            <code>Dispatch&lt;SetStateAction&lt;boolean&gt;&gt;</code> — rarely needed directly; the hook manages this internally. Use a separate <code>useState</code> for popup visibility.
           </span>
         </div>
       </div>
