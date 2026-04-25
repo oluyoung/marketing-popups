@@ -8,5 +8,8 @@ export default defineConfig({
   server: {
     hmr: true, // This is the default; ensure it's not set to false!
     // Optional: Customize HMR port (if default 24678 is blocked)
+  },
+  build: {
+    outDir: './docs'
   }
 })
